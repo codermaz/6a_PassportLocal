@@ -8,11 +8,11 @@
 // const {document} = (new JSDOM('')).window;
 // global.document = document;
 
-var express = require('express');
-var router = express.Router();
-var mysql = require('mysql');
+let express = require('express');
+let router = express.Router();
 
-var connection = mysql.createConnection({
+let mysql = require('mysql');
+let connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'userMA3',
     password: 'passMA3',
@@ -38,10 +38,10 @@ router.get('/', function (req, res, next) {
 router.post('/', function (req, res, next) {
     let username = req.body.usernameName;
     let password = req.body.passwordName;
-    let sqlGetAll = "SELECT * FROM userstable WHERE username=?";
+    let sqlFindUser = "SELECT * FROM userstable WHERE username=?";
     let sqlInsertUser = "INSERT INTO userstable (username, password) VALUES ?";
 
-    connection.query(sqlGetAll, username, (err, result) => {
+    connection.query(sqlFindUser, username, (err, result) => {
         if (err) {
             return done(err);
         }
