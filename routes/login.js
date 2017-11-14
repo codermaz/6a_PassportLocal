@@ -1,7 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
+let express = require('express');
+let router = express.Router();
+let passport = require('passport');
+let LocalStrategy = require('passport-local').Strategy;
+let connection = require('./database/sqlConfig');
 
 passport.serializeUser(function (user, done) {
     done(null, user);
@@ -14,17 +15,23 @@ passport.deserializeUser(function (user, done) {
 
 passport.use(new LocalStrategy(
     function (username, password, done) {
+        let sqlFindUserWithPassword = "SELECT * FROM userstable WHERE username=? AND password=?";
 
-        // Später erfolgt hier ein Datenbank-Call. Hier nun zur Demo nur ein Nutzer:
-        if ((username === "Hans") && (password === "1234")) {
-            // User / Pwd  stimmt
-            return done(null, true);
-        } else {
-            // User / Pwd falsch
-            return done(null, false);
-        }
+        connection.query(sqlFindUserWithPassword, [username, password], (err, result) => {
+            if (err) {
+                return done(err);
+            }
+            if (result.length !== 0) {
+                // User / Pwd  stimmt
+                return done(null, true);
+            } else {
+                // User / Pwd falsch
+                return done(null, false);
+            }
+
+        });
     }
-));
+    ));
 
 // Login über Post der HTML Form
 router.post('/', function (req, res, next) {

@@ -18,7 +18,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-    let sqlGetAll = "SELECT * FROM userstable WHERE username=?";
+    let sqlFindUser = "SELECT * FROM userstable WHERE username=?";
     //  sqlInsertUser = "INSERT INTO userstable (username, password) VALUES (?,?)"  <--> con.Query(sqlInsertUser,(username,password), function ...)
     let sqlInsertUser = "INSERT INTO userstable SET ?";
 
@@ -27,7 +27,7 @@ router.post('/', function (req, res, next) {
         password: req.body.passwordName
     };
 
-    connection.query(sqlGetAll, userObject.username, (err, result) => {
+    connection.query(sqlFindUser, userObject.username, (err, result) => {
         if (err) {
             return done(err);
         }
