@@ -10,38 +10,24 @@
 
 let express = require('express');
 let router = express.Router();
-
-let mysql = require('mysql');
-let connection = mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'userMA3',
-    password: 'passMA3',
-    // port: '3306',
-    database: 'webapp'
-});
-
-connection.connect(function (err) {
-    if (err) {
-        console.error('error connecting: ' + err.stack);
-        return;
-    }
-    console.log('connection as id ' + connection.threadId);
-    return connection;
-});
+let connection = require('./database/sqlConfig');
 
 // Get Register Page
 router.get('/', function (req, res, next) {
     res.render("register");
 });
 
-
 router.post('/', function (req, res, next) {
-    let username = req.body.usernameName;
-    let password = req.body.passwordName;
-    let sqlFindUser = "SELECT * FROM userstable WHERE username=?";
-    let sqlInsertUser = "INSERT INTO userstable (username, password) VALUES ?";
+    let sqlGetAll = "SELECT * FROM userstable WHERE username=?";
+    //  sqlInsertUser = "INSERT INTO userstable (username, password) VALUES (?,?)"  <--> con.Query(sqlInsertUser,(username,password), function ...)
+    let sqlInsertUser = "INSERT INTO userstable SET ?";
 
-    connection.query(sqlFindUser, username, (err, result) => {
+    let userObject = {
+        username: req.body.usernameName,
+        password: req.body.passwordName
+    };
+
+    connection.query(sqlGetAll, userObject.username, (err, result) => {
         if (err) {
             return done(err);
         }
@@ -49,17 +35,15 @@ router.post('/', function (req, res, next) {
             console.log('The User is already registered');
             return;
         }
-        connection.query("INSERT INTO userstable (username, password) VALUES (?,?)", [username, password], (err, result) => {
+        connection.query(sqlInsertUser, userObject, (err, result) => {
             if (err) throw err;
             console.log("Number of records inserted: ", result.affectedRows);
             // $("label[for='status']").text("10 kms");
-            // document.getElementById('statusId').innerText = "username " + username + " added successfully...";
+            // document.getElementById('statusId').innerText = "username " + userObject.username + " added successfully...";
         });
 
     });
-    console.log('user: ' + username + ', password: ' + password);
 
 });
-
 
 module.exports = router;
